@@ -3,12 +3,22 @@ using System;
 using System.Threading;
 using static System.Net.Mime.MediaTypeNames;
 
-string loginUser = "";
-string loginPass = "";
+string? loginUser = "";
+bool userY = false;
 bool hasLogin = false;
 bool DebugMode = false;
-bool ran1 = false;
 bool authY = false;
+
+//warning
+Console.ForegroundColor = ConsoleColor.Red;
+Console.WriteLine("WARNING:");
+Console.ForegroundColor = ConsoleColor.Yellow;
+Console.WriteLine("This is schizophrenia simulator for now.");
+Console.WriteLine("The online part is not done yet." + "\n");
+Console.ForegroundColor = ConsoleColor.White;
+Console.WriteLine("Press any key to continue.");
+Console.ReadKey();
+Console.Clear();
 
 #if DEBUG
 Console.WriteLine("Debug Mode");
@@ -18,25 +28,49 @@ DebugMode = true;
 
 void MsgScr()
 {
+    Console.Clear();
     string loginU = loginUser;
-    string ab = "[" + loginU + "] Write: ";
+    string ab = "[" + loginU + "] (YOU): ";
     string c = "[" + loginU + "]: ";
     Thread.Sleep(520);
-    Console.WriteLine(ab);
-    string? input = Console.ReadLine();
-    if (input == "exit")
+    while (true)
     {
-        Console.Clear();
-        Quit();
-    }
-    else
-    {
-        Console.WriteLine(c + input);
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.Write(ab);
+        string? input = Console.ReadLine();
+        if (input == "exit")
+        {
+            Console.Clear();
+            Quit();
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(c + input);
+            Console.ForegroundColor = ConsoleColor.White;
+        }
     }
 }
 
 void MsgOpt()
 {
+    //config check
+    //if (File.Exists(@"config.dat"))
+    //{
+      //  using (StreamReader sr = File.OpenText(@"config.dat"))
+        //{
+          //  string? s = "";
+            //if ((s = sr.ReadLine()) != null)
+            //{
+               //help
+           // }
+        //}
+   // }
+    //else
+    //{
+     //   StreamWriter sw = File.CreateText(@"config.dat");
+    //}
+
     Console.WriteLine("Choose Chat Option");
     Console.WriteLine("1) Debug Chat");
     Console.WriteLine("2) Exit");
@@ -61,7 +95,7 @@ static void Quit()
 }
 void loginState()
 {
-    if(loginUser == null && loginPass == null)
+    if(loginUser == null)
     {
         hasLogin = false;
     }
@@ -77,36 +111,31 @@ void preLogin()
             string? s = "";
             if ((s = sr.ReadLine()) != null)
             {
-                if (ran1 != true)
-                {
-                    loginUser = s;
-                    ran1 = true;
-                    preLogin();
-                }
-                else if (ran1)
-                {
-                    loginPass = s;
-                }
+                loginUser = s;
                 
-                if (loginUser != null && loginPass != null)
+                if (loginUser != null)
                 {
-                    Console.WriteLine(loginUser, " and ", loginPass);
                     hasLogin = true;
+                    userY = true;
                 }
             }
+            else
+            {
+                userY = false;
+                hasLogin = false;
+            }
+            sr.Close();
         }
     }
     else
     {
         StreamWriter sw = File.CreateText(fileN);
+        sw.Close();
         preLogin();
     }
 }
 
-loginState();
-preLogin();
-
-void Auth(string? usr, string? pas, bool newUsr, bool debugMode)
+void Auth(string? usr, bool newUsr, bool debugMode)
 {
     //debug workaround lmao
     if (debugMode != true)
@@ -127,7 +156,7 @@ void Auth(string? usr, string? pas, bool newUsr, bool debugMode)
         {
             Console.WriteLine("Writing info");
             sw.WriteLine(usr);
-            sw.WriteLine(pas);
+            sw.Close();
             Console.WriteLine("Write done");
         }
 
@@ -137,108 +166,138 @@ void Auth(string? usr, string? pas, bool newUsr, bool debugMode)
             string? s = "";
             if ((s = sr.ReadLine()) != null)
             {
-                string compUsr = "";
-                string compPas = "";
-                while (ran1 != true)
-                {
-                    compUsr = s;
-                    ran1 = true;
-                    Console.WriteLine("The scanned usr " + compUsr);
-                }
-                if (ran1)
-                {
-                    compPas = s;
-                    Console.WriteLine("The scaned pass " + compPas);
-                }
+                string? compUsr = usr;
+                Console.WriteLine(compUsr);
 
-                if (compUsr == usr && compPas == pas)
+                if (compUsr == usr)
                 {
                     authY = true;
+                    loginUser = compUsr;
                 }
                 else {
                 authY = false;
                 }
             }
+            sr.Close();
         }
     }
     else
     {
         //Reading LAG file.
+        //Should be for auth but its not?? WTF
         //It prints it out in debug mode for testing.
         using (StreamReader sr = File.OpenText(fileN))
         {
             string? s = "";
-            while ((s = sr.ReadLine()) != null)
+            if ((s = sr.ReadLine()) != null)
             {
-                if (debugMode)
+                string? compUsr = usr;
+                Console.WriteLine(compUsr);
+
+                if (compUsr == usr)
                 {
-                    Console.WriteLine(s);
+                    authY = true;
+                }
+                else
+                {
+                    authY = false;
                 }
             }
+            sr.Close();
         }
     }
 }
 
+//Method Run Here
+loginState();
+preLogin();
+
 while (hasLogin != true)
 {
-    Console.WriteLine("Please Login.");
-    Console.WriteLine("1) Login");
-    Console.WriteLine("2) Make Account");
-    Console.WriteLine("3) Reset App Data");
-    Console.WriteLine("4) Exit App");
-    string? loginChoice = Console.ReadLine();
-    if (loginChoice == "1")
+    if (userY)
     {
-        Console.WriteLine("Enter Username");
-        string? usrN = Console.ReadLine();
-        Console.Clear();
-        Console.WriteLine("Enter Password");
-        string? passW = Console.ReadLine();
-        Console.Clear();
-        Console.WriteLine("Authenticating. Please Wait.");
-        Auth(usrN, passW, false, DebugMode);
-        if (authY)
+        Console.WriteLine("Please Login.");
+        Console.WriteLine("1) Login");
+        Console.WriteLine("2) Make Account");
+        Console.WriteLine("3) Reset App Data");
+        Console.WriteLine("4) Exit App");
+        string? loginChoice = Console.ReadLine();
+        if (loginChoice == "1")
         {
-            MsgScr();
+            Console.WriteLine("Enter Username");
+            string? usrN = Console.ReadLine();
+            Console.Clear();
+            Console.WriteLine("We don't use passwords because theres no point.");
+            Console.WriteLine("All message data does not get saved, nor your creds.");
+            Console.WriteLine("Your username is persistant, but you can delete that too.");
+            Console.WriteLine("Press any key to continue.");
+            Console.ReadKey();
+            Console.Clear();
+            Console.WriteLine("Authenticating. Please Wait.");
+            Auth(usrN, false, DebugMode);
+            if (authY)
+            {
+                MsgScr();
+            }
+            else
+            {
+                hasLogin = false;
+            }
         }
-        else
+
+        else if (loginChoice == "2")
         {
-            hasLogin = false;
+            Console.WriteLine("Enter New Username");
+            string? usrN = Console.ReadLine();
+            Console.Clear();
+            Console.WriteLine("We don't use passwords because theres no point.");
+            Console.WriteLine("All message data does not get saved, nor your creds.");
+            Console.WriteLine("Your username is persistant, but you can delete that too.");
+            Console.WriteLine("Press any key to continue.");
+            Console.ReadKey();
+            Console.Clear();
+            Console.WriteLine("Authenticating new account. Please Wait.");
+            Auth(usrN, true, DebugMode);
+            Thread.Sleep(750);
+            Console.Clear();
+        }
+
+        else if (loginChoice == "3")
+        {
+            if (File.Exists(@"LAG.dll"))
+            {
+                File.Delete(@"LAG.dll");
+                Console.WriteLine("Data cleared.");
+                Quit();
+            }
+            else
+            {
+                Console.WriteLine("There is no data.");
+                Quit();
+            }
+        }
+
+        else if (loginChoice == "4")
+        {
+            Quit();
         }
     }
-
-    else if (loginChoice == "2")
+    else
     {
         Console.WriteLine("Enter New Username");
         string? usrN = Console.ReadLine();
         Console.Clear();
-        Console.WriteLine("Enter New Password");
-        string? passW = Console.ReadLine();
+        Console.WriteLine("We don't use passwords because theres no point.");
+        Console.WriteLine("All message data does not get saved, nor your creds.");
+        Console.WriteLine("Your username is persistant, but you can delete that too.");
+        Console.WriteLine("Press any key to continue.");
+        Console.ReadKey();
         Console.Clear();
         Console.WriteLine("Authenticating new account. Please Wait.");
-        Auth(usrN, passW, true, DebugMode);
+        Auth(usrN, true, DebugMode);
         Thread.Sleep(750);
         Console.Clear();
-    }
-
-    else if (loginChoice == "3")
-    {
-        if (File.Exists(@"LAG.dll"))
-        {
-            File.Delete(@"LAG.dll");
-            Console.WriteLine("Data cleared.");
-            Quit();
-        }
-        else
-        {
-            Console.WriteLine("There is no data.");
-            Quit();
-        }
-    }
-
-    else if (loginChoice == "4")
-    {
-        Quit();
+        userY = true;
     }
 
 }
