@@ -37,6 +37,7 @@ void MsgScr()
     {
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.Write(ab);
+        Console.ForegroundColor = ConsoleColor.White;
         string? input = Console.ReadLine();
         if (input == "exit")
         {
@@ -46,7 +47,9 @@ void MsgScr()
         else
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(c + input);
+            Console.Write(c);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(input);
             Console.ForegroundColor = ConsoleColor.White;
         }
     }
