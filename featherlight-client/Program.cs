@@ -1,11 +1,14 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Threading;
 using static System.Net.Mime.MediaTypeNames;
 
-string? loginUser = "Username";
-string? loginPass = "Password";
+string loginUser = "";
+string loginPass = "";
 bool hasLogin = false;
 bool DebugMode = false;
+bool ran1 = false;
+bool authY = false;
 
 #if DEBUG
 Console.WriteLine("Debug Mode");
@@ -13,6 +16,49 @@ Console.WriteLine("");
 DebugMode = true;
 #endif
 
+void MsgScr()
+{
+    string loginU = loginUser;
+    string ab = "[" + loginU + "] Write: ";
+    string c = "[" + loginU + "]: ";
+    Thread.Sleep(520);
+    Console.WriteLine(ab);
+    string? input = Console.ReadLine();
+    if (input == "exit")
+    {
+        Console.Clear();
+        Quit();
+    }
+    else
+    {
+        Console.WriteLine(c + input);
+    }
+}
+
+void MsgOpt()
+{
+    Console.WriteLine("Choose Chat Option");
+    Console.WriteLine("1) Debug Chat");
+    Console.WriteLine("2) Exit");
+    string? mC2 = Console.ReadLine();
+    
+    if (mC2 == "1")
+    {
+        MsgScr();
+    }
+
+    else if (mC2 == "2")
+    {
+        Quit();
+    }
+}
+
+static void Quit()
+{
+    Console.WriteLine("Exiting...");
+    Thread.Sleep(800);
+    Environment.Exit(0);
+}
 void loginState()
 {
     if(loginUser == null && loginPass == null)
@@ -29,13 +75,22 @@ void preLogin()
         using (StreamReader sr = File.OpenText(fileN))
         {
             string? s = "";
-            while ((s = sr.ReadLine()) != null)
+            if ((s = sr.ReadLine()) != null)
             {
-                string? loginUser = s;
-                string? loginPass = s;
+                if (ran1 != true)
+                {
+                    loginUser = s;
+                    ran1 = true;
+                    preLogin();
+                }
+                else if (ran1)
+                {
+                    loginPass = s;
+                }
+                
                 if (loginUser != null && loginPass != null)
                 {
-                    Console.WriteLine(loginUser, " ", loginPass);
+                    Console.WriteLine(loginUser, " and ", loginPass);
                     hasLogin = true;
                 }
             }
@@ -48,9 +103,10 @@ void preLogin()
     }
 }
 
+loginState();
 preLogin();
 
-void Auth(string usr, string pas, bool newUsr, bool debugMode)
+void Auth(string? usr, string? pas, bool newUsr, bool debugMode)
 {
     //debug workaround lmao
     if (debugMode != true)
@@ -66,6 +122,7 @@ void Auth(string usr, string pas, bool newUsr, bool debugMode)
     string fileN = @"LAG.dll";
     if (newUsr)
     {
+        //Write data
         using (StreamWriter sw = File.CreateText(fileN))
         {
             Console.WriteLine("Writing info");
@@ -74,16 +131,32 @@ void Auth(string usr, string pas, bool newUsr, bool debugMode)
             Console.WriteLine("Write done");
         }
 
+        //Read data
         using (StreamReader sr = File.OpenText(fileN))
         {
             string? s = "";
-            while ((s = sr.ReadLine()) != null)
+            if ((s = sr.ReadLine()) != null)
             {
-                string? un = s;
-                string? us = s;
-                if (debugMode)
+                string compUsr = "";
+                string compPas = "";
+                while (ran1 != true)
                 {
-                    Console.WriteLine(un, " ", us);
+                    compUsr = s;
+                    ran1 = true;
+                    Console.WriteLine("The scanned usr " + compUsr);
+                }
+                if (ran1)
+                {
+                    compPas = s;
+                    Console.WriteLine("The scaned pass " + compPas);
+                }
+
+                if (compUsr == usr && compPas == pas)
+                {
+                    authY = true;
+                }
+                else {
+                authY = false;
                 }
             }
         }
@@ -101,7 +174,6 @@ void Auth(string usr, string pas, bool newUsr, bool debugMode)
                 {
                     Console.WriteLine(s);
                 }
-                Console.WriteLine("Read the file.");
             }
         }
     }
@@ -125,7 +197,14 @@ while (hasLogin != true)
         Console.Clear();
         Console.WriteLine("Authenticating. Please Wait.");
         Auth(usrN, passW, false, DebugMode);
-        Console.ReadKey();
+        if (authY)
+        {
+            MsgScr();
+        }
+        else
+        {
+            hasLogin = false;
+        }
     }
 
     else if (loginChoice == "2")
@@ -144,23 +223,64 @@ while (hasLogin != true)
 
     else if (loginChoice == "3")
     {
-        Console.WriteLine("Not implamented yet!");
-        Thread.Sleep(2500);
-        Environment.Exit(0);
+        if (File.Exists(@"LAG.dll"))
+        {
+            File.Delete(@"LAG.dll");
+            Console.WriteLine("Data cleared.");
+            Quit();
+        }
+        else
+        {
+            Console.WriteLine("There is no data.");
+            Quit();
+        }
     }
 
     else if (loginChoice == "4")
     {
-        Console.WriteLine("Exiting...");
-        Thread.Sleep(800);
-        Environment.Exit(0);
+        Quit();
     }
 
 }
 
 while (hasLogin)
 {
-    Console.WriteLine("Logging you in. Please Wait.");
-    
-    Console.ReadKey();
+    Console.WriteLine("Choose an option.");
+    Console.WriteLine("1) Choose chat method and join.");
+    Console.WriteLine("2) Options");
+    Console.WriteLine("3) Reset App Data");
+    Console.WriteLine("4) Exit");
+    string? mC = Console.ReadLine();
+
+    if (mC == "1")
+    {
+        MsgOpt();
+    }
+
+    else if (mC == "2")
+    {
+        Console.WriteLine("Not DONE");
+        Thread.Sleep(1500);
+        Quit();
+    }
+
+    else if (mC == "3")
+    {
+        if (File.Exists(@"LAG.dll"))
+        {
+            File.Delete(@"LAG.dll");
+            Console.WriteLine("Data cleared.");
+            Quit();
+        }
+        else
+        {
+            Console.WriteLine("There is no data.");
+            Quit();
+        }
+    }
+
+    else if (mC == "4")
+    {
+        Quit();
+    }
 }
