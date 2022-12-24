@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using static System.Net.Mime.MediaTypeNames;
 
 string? loginUser = "Username";
 string? loginPass = "Password";
@@ -23,19 +24,27 @@ void loginState()
 void preLogin()
 {
     string fileN = @"LAG.dll";
-    using (StreamReader sr = File.OpenText(fileN))
+    if (File.Exists(fileN))
     {
-        string? s = "";
-        while ((s = sr.ReadLine()) != null)
+        using (StreamReader sr = File.OpenText(fileN))
         {
-            string? loginUser = s;
-            string? loginPass = s;
-            if (loginUser != null && loginPass != null)
+            string? s = "";
+            while ((s = sr.ReadLine()) != null)
             {
-                Console.WriteLine(loginUser, " ", loginPass);
-                hasLogin = true;
+                string? loginUser = s;
+                string? loginPass = s;
+                if (loginUser != null && loginPass != null)
+                {
+                    Console.WriteLine(loginUser, " ", loginPass);
+                    hasLogin = true;
+                }
             }
         }
+    }
+    else
+    {
+        StreamWriter sw = File.CreateText(fileN);
+        preLogin();
     }
 }
 
