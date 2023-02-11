@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualBasic;
+﻿using featherlight_client;
 using System;
 using System.Threading;
 using static System.Net.Mime.MediaTypeNames;
@@ -8,23 +8,84 @@ bool userY = false;
 bool hasLogin = false;
 bool DebugMode = false;
 bool authY = false;
+bool onlineOFF = true;
 
 //warning
-Console.ForegroundColor = ConsoleColor.Red;
-Console.WriteLine("WARNING:");
-Console.ForegroundColor = ConsoleColor.Yellow;
-Console.WriteLine("This is schizophrenia simulator for now.");
-Console.WriteLine("The online part is not done yet." + "\n");
-Console.ForegroundColor = ConsoleColor.White;
-Console.WriteLine("Press any key to continue.");
-Console.ReadKey();
-Console.Clear();
+if (onlineOFF == true)
+{
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("WARNING:");
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("This is schizophrenia simulator for now.");
+    Console.WriteLine("The online part is not done yet." + "\n");
+    Console.ForegroundColor = ConsoleColor.White;
+    Console.WriteLine("Press any key to continue.");
+    Console.ReadKey();
+    Console.Clear();
+}
+else
+    onlineOFF = false;
 
 #if DEBUG
 Console.WriteLine("Debug Mode");
 Console.WriteLine("");
 DebugMode = true;
 #endif
+
+void Connect()
+{
+    Console.WriteLine("1) Send" + "\n" + "2) Get");
+    string? inpC = Console.ReadLine();
+    if (inpC == "1")
+    {
+        Send();
+    }
+
+    if (inpC == "2")
+    {
+        Listen();
+    }
+}
+
+void Listen()
+{
+    Console.Clear();
+    Console.WriteLine("Enter Port to listen on.");
+    string? new_portS = Console.ReadLine();
+    int new_port = 0;
+    try
+    {
+        int portP = Int32.Parse(new_portS);
+        new_port = portP;
+    }
+    catch (FormatException e)
+    {
+        Console.WriteLine(e.Message);
+    }
+    //Put new connection stuff here
+}
+
+void Send()
+{
+    Console.Clear();
+    Console.WriteLine("Enter IP");
+    string? new_ip = Console.ReadLine();
+    Console.WriteLine("Enter Port");
+    string? new_portS = Console.ReadLine();
+    int new_port = 0;
+    try
+    {
+        int portP = Int32.Parse(new_portS);
+        new_port = portP;
+    }
+    catch (FormatException e)
+    {
+        Console.WriteLine(e.Message);
+    }
+    Console.WriteLine("Enter Message");
+    string? message = Console.ReadLine();
+    //new stuff here
+}
 
 void MsgScr()
 {
@@ -39,10 +100,28 @@ void MsgScr()
         Console.Write(ab);
         Console.ForegroundColor = ConsoleColor.White;
         string? input = Console.ReadLine();
-        if (input == "exit")
+        if (input == "!exit")
         {
             Console.Clear();
             Quit();
+        }
+        else if (input == "!help")
+        {
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("!help - Shows commands.");
+            //custom commands here
+            Console.WriteLine("!leave - Disconnects you, returns back to menu.");
+            //end of custom commands
+            Console.WriteLine("!exit - Quits app.");
+        }
+        else if (input == "!leave")
+        {
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Disconnecting...");
+            Console.WriteLine("Online Not Done yet!");
+            Thread.Sleep(1500);
+            Console.Clear();
+            return;
         }
         else
         {
@@ -75,16 +154,29 @@ void MsgOpt()
     //}
 
     Console.WriteLine("Choose Chat Option");
-    Console.WriteLine("1) Debug Chat");
-    Console.WriteLine("2) Exit");
+    Console.WriteLine("1) Online Chat (2-Way)");
+    Console.WriteLine("2) Debug Chat (NO ONLINE)");
+    Console.WriteLine("3) Online Connect Test (BROKEN)");
+    Console.WriteLine("4) Exit");
     string? mC2 = Console.ReadLine();
     
     if (mC2 == "1")
     {
-        MsgScr();
+        var MsgEv = new MsgEnv();
+        MsgEv.Main();
     }
 
     else if (mC2 == "2")
+    {
+        MsgScr();
+    }
+
+    else if (mC2 == "3")
+    {
+        Connect();
+    }
+
+    else if (mC2 == "4")
     {
         Quit();
     }
